@@ -1,0 +1,23 @@
+{
+  "name": "sales-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Retail Sales Management System",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "seed": "node src/utils/seedDatabase.js",
+    "test:db": "node src/utils/testConnection.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "mongodb": "^6.3.0",
+    "mongoose": "^9.0.1"
+  },
+  "devDependencies": {
+    "csv-parser": "^3.0.0"
+  }
+}

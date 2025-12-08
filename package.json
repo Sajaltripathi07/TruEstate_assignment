@@ -1,0 +1,16 @@
+{
+  "name": "retail-sales-management-system",
+  "version": "1.0.0",
+  "description": "Retail Sales Management System - Full Stack Application",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  }
+}
+
