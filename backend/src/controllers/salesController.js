@@ -20,7 +20,6 @@ class SalesController {
         sortOrder
       } = req.query;
 
-      // Parse array parameters
       const params = {
         page: parseInt(page) || 1,
         limit: parseInt(limit) || 10,

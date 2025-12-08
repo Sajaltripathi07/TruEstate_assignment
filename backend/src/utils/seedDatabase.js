@@ -26,13 +26,11 @@ async function importCSV() {
         try {
           await connectToDatabase();
           
-          // Clear existing collection
           const { getDatabase } = await import('../models/salesModel.js');
           const collection = await getSalesCollection();
           await collection.deleteMany({});
           console.log('Cleared existing sales collection');
           
-          // Transform CSV data to MongoDB documents
           const documents = results.map(row => ({
             transactionId: parseInt(row['Transaction ID']) || null,
             date: row['Date'] || null,
@@ -62,9 +60,8 @@ async function importCSV() {
             employeeName: row['Employee Name'] || null
           }));
 
-          // Insert in batches for better performance
           console.log('Starting bulk insert...');
-          const batchSize = 1000; // Reduced batch size to avoid memory issues
+          const batchSize = 1000;
           let inserted = 0;
           let errors = 0;
           
@@ -76,7 +73,6 @@ async function importCSV() {
               inserted += count;
               console.log(`Inserted ${inserted}/${documents.length} records... (${Math.round((inserted/documents.length)*100)}%)`);
             } catch (error) {
-              // Continue with next batch if there are duplicate key errors or write errors
               if (error.code === 11000 || error.writeErrors) {
                 const insertedInBatch = error.insertedIds ? Object.keys(error.insertedIds).length : 0;
                 inserted += insertedInBatch;
@@ -90,10 +86,9 @@ async function importCSV() {
           }
           
           if (errors > 0) {
-            console.log(`\n⚠️  Warning: ${errors} documents had errors (likely duplicates)`);
+            console.log(`\n Warning: ${errors} documents had errors (likely duplicates)`);
           }
           
-          // Create indexes after data insertion
           console.log('\nCreating indexes...');
           try {
             await createIndexes();
@@ -102,7 +97,7 @@ async function importCSV() {
             console.warn('This is usually okay - the application will still work');
           }
           
-          console.log('\n✅ Data import completed successfully!');
+          console.log('\n Data import completed successfully!');
           console.log(`   Total records processed: ${documents.length}`);
           console.log(`   Successfully inserted: ${inserted}`);
           if (errors > 0) {

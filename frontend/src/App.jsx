@@ -34,7 +34,6 @@ function App() {
     totalPages: 0
   });
 
-  // Filter and search state
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState({
     regions: [],
@@ -50,12 +49,10 @@ function App() {
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState('desc');
 
-  // Load filter options on mount
   useEffect(() => {
     loadFilterOptions();
   }, []);
 
-  // Load sales data when filters/search/sort/pagination changes
   useEffect(() => {
     loadSales();
     loadMetrics();
@@ -65,7 +62,6 @@ function App() {
     try {
       const options = await fetchFilterOptions();
       setFilterOptions(options);
-      // Set default date range
       if (options.dateRange.min && options.dateRange.max) {
         setFilters(prev => ({
           ...prev,
@@ -90,7 +86,6 @@ function App() {
         sortOrder
       };
 
-      // Remove empty values
       Object.keys(params).forEach(key => {
         if (params[key] === '' || (Array.isArray(params[key]) && params[key].length === 0)) {
           delete params[key];

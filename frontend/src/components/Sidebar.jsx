@@ -9,7 +9,6 @@ function Sidebar() {
 
   return (
     <div className="sidebar">
-      
       <nav className="sidebar-nav">
         <a href="#" className="nav-item">Dashboard</a>
         <a href="#" className="nav-item">Nexus</a>

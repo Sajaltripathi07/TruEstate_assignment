@@ -9,29 +9,31 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors());
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
+
+app.use(cors({
+  origin: FRONTEND_ORIGIN,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
-// Connect to MongoDB
 connectToDatabase()
   .then(() => {
-    console.log('✅ Database connection established');
+    console.log('Database connection established');
   })
   .catch((error) => {
-    console.error('❌ Failed to connect to database:', error.message);
+    console.error(' Failed to connect to database:', error.message);
     console.error('Server will start but database operations will fail');
   });
 
-// Routes
 app.use('/api/sales', salesRoutes);
 
-// Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Sales Management API is running' });
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });

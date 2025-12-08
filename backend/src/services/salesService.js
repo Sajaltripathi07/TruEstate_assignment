@@ -22,7 +22,6 @@ class SalesService {
     const collection = await getSalesCollection();
     const query = {};
 
-    // Search condition - case-insensitive search on customerName and phoneNumber
     if (search) {
       query.$or = [
         { customerName: { $regex: search, $options: 'i' } },
@@ -30,17 +29,14 @@ class SalesService {
       ];
     }
 
-    // Region filter
     if (regions.length > 0) {
       query.customerRegion = { $in: regions };
     }
 
-    // Gender filter
     if (genders.length > 0) {
       query.gender = { $in: genders };
     }
 
-    // Age range filter
     if (ageMin !== undefined && ageMin !== null && ageMin !== '') {
       query.age = { ...query.age, $gte: parseInt(ageMin) };
     }
@@ -48,19 +44,16 @@ class SalesService {
       query.age = { ...query.age, $lte: parseInt(ageMax) };
     }
 
-    // Category filter
     if (categories.length > 0) {
       query.productCategory = { $in: categories };
     }
 
-    // Tags filter - tags field contains comma-separated values
     if (tags.length > 0) {
       const tagConditions = tags.map(tag => ({
         tags: { $regex: tag, $options: 'i' }
       }));
       
       if (query.$or) {
-        // If search already has $or, combine with $and
         query.$and = [
           { $or: query.$or },
           { $or: tagConditions }
@@ -71,12 +64,10 @@ class SalesService {
       }
     }
 
-    // Payment method filter
     if (paymentMethods.length > 0) {
       query.paymentMethod = { $in: paymentMethods };
     }
 
-    // Date range filter
     if (dateFrom) {
       query.date = { ...query.date, $gte: dateFrom };
     }
@@ -84,7 +75,6 @@ class SalesService {
       query.date = { ...query.date, $lte: dateTo };
     }
 
-    // Build sort object
     let sort = {};
     switch (sortBy) {
       case 'date':
@@ -100,10 +90,8 @@ class SalesService {
         sort.date = -1;
     }
 
-    // Get total count
     const total = await collection.countDocuments(query);
 
-    // Get paginated data
     const skip = (page - 1) * limit;
     const data = await collection
       .find(query)
@@ -112,7 +100,6 @@ class SalesService {
       .limit(parseInt(limit))
       .toArray();
 
-    // Transform field names to match frontend expectations
     const transformedData = data.map(item => ({
       transactionId: item.transactionId,
       date: item.date,
@@ -171,7 +158,6 @@ class SalesService {
     const collection = await getSalesCollection();
     const query = {};
 
-    // Apply same filters as getSales
     if (regions.length > 0) {
       query.customerRegion = { $in: regions };
     }
@@ -209,7 +195,6 @@ class SalesService {
       query.date = { ...query.date, $lte: dateTo };
     }
 
-    // Use aggregation pipeline for metrics
     const pipeline = [
       { $match: query },
       {
@@ -264,31 +249,26 @@ class SalesService {
 
     const results = {};
 
-    // Get distinct regions
     const regions = await collection.distinct('customerRegion', {
       customerRegion: { $ne: null }
     });
     results.regions = regions.filter(Boolean).sort();
 
-    // Get distinct genders
     const genders = await collection.distinct('gender', {
       gender: { $ne: null }
     });
     results.genders = genders.filter(Boolean).sort();
 
-    // Get distinct categories
     const categories = await collection.distinct('productCategory', {
       productCategory: { $ne: null }
     });
     results.categories = categories.filter(Boolean).sort();
 
-    // Get distinct payment methods
     const paymentMethods = await collection.distinct('paymentMethod', {
       paymentMethod: { $ne: null }
     });
     results.paymentMethods = paymentMethods.filter(Boolean).sort();
 
-    // Get distinct tags - tags are comma-separated strings
     const tagsPipeline = [
       { $match: { tags: { $ne: null, $ne: '' } } },
       { $project: { tags: { $split: ['$tags', ','] } } },
@@ -301,7 +281,6 @@ class SalesService {
     const tagsResult = await collection.aggregate(tagsPipeline).toArray();
     results.tags = tagsResult.map(item => item.tag);
 
-    // Get age range
     const agePipeline = [
       { $match: { age: { $ne: null } } },
       {
@@ -318,7 +297,6 @@ class SalesService {
       max: ageResult[0]?.max ? parseInt(ageResult[0].max) : 100
     };
 
-    // Get date range
     const datePipeline = [
       { $match: { date: { $ne: null } } },
       {
