@@ -12,16 +12,22 @@ async function importCSV() {
   return new Promise((resolve, reject) => {
     const results = [];
     const csvPath = path.join(__dirname, '../../../dataset.csv');
+    let rowCount = 0;
     
     console.log('Reading CSV file...');
+    console.log('This may take a while for large files...');
     
     fs.createReadStream(csvPath)
       .pipe(csv())
       .on('data', (data) => {
         results.push(data);
+        rowCount++;
+        if (rowCount % 10000 === 0) {
+          process.stdout.write(`\rReading CSV... ${rowCount.toLocaleString()} records loaded`);
+        }
       })
       .on('end', async () => {
-        console.log(`Loaded ${results.length} records from CSV`);
+        console.log(`\nLoaded ${results.length.toLocaleString()} records from CSV`);
         
         try {
           await connectToDatabase();
