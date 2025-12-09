@@ -21,6 +21,16 @@ export async function createIndexes() {
     }
     
     try {
+      await collection.dropIndex('transactionId_1');
+    } catch (err) {
+    }
+    
+    try {
+      await collection.dropIndex({ transactionId: 1 });
+    } catch (err) {
+    }
+    
+    try {
       await collection.createIndex({ customerName: 'text', phoneNumber: 'text' }, { name: 'text_search_index' });
     } catch (err) {
       console.warn('Text index creation skipped (may already exist or conflict):', err.message);
@@ -33,15 +43,12 @@ export async function createIndexes() {
     await collection.createIndex({ paymentMethod: 1 });
     await collection.createIndex({ age: 1 });
     await collection.createIndex({ quantity: -1 });
-    await collection.createIndex({ transactionId: 1 }, { unique: true, sparse: true });
-    await collection.createIndex({ date: -1 });
-    await collection.createIndex({ customerRegion: 1 });
-    await collection.createIndex({ gender: 1 });
-    await collection.createIndex({ productCategory: 1 });
-    await collection.createIndex({ paymentMethod: 1 });
-    await collection.createIndex({ age: 1 });
-    await collection.createIndex({ quantity: -1 });
-    await collection.createIndex({ transactionId: 1 }, { unique: true });
+    
+    try {
+      await collection.createIndex({ transactionId: 1 }, { sparse: true });
+    } catch (err) {
+      console.warn('TransactionId index creation skipped:', err.message);
+    }
     
     console.log('Indexes created successfully');
   } catch (error) {
